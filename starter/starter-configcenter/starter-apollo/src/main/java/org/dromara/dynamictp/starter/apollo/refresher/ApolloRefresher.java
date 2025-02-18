@@ -30,11 +30,13 @@ import lombok.val;
 import org.dromara.dynamictp.common.em.ConfigFileTypeEnum;
 import org.dromara.dynamictp.common.properties.DtpProperties;
 import org.dromara.dynamictp.core.handler.ConfigHandler;
+import org.dromara.dynamictp.core.support.task.wrapper.TtlTaskWrapper;
 import org.dromara.dynamictp.spring.AbstractSpringRefresher;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.dromara.dynamictp.common.constant.DynamicTpConst.MAIN_PROPERTIES_PREFIX;
 
@@ -59,7 +61,8 @@ public class ApolloRefresher extends AbstractSpringRefresher implements ConfigFi
         String namespace = changeEvent.getNamespace();
         String newValue = changeEvent.getNewValue();
         ConfigFileTypeEnum configFileType = deduceConfigFileType(namespace);
-        refresh(newValue, configFileType);
+        //异步刷新
+        CompletableFuture.runAsync(() -> {refresh(newValue, configFileType);});
     }
 
     @Override

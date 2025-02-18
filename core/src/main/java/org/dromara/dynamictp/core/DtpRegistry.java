@@ -56,6 +56,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -83,9 +86,15 @@ public class DtpRegistry {
 
     private static DtpProperties dtpProperties;
 
+    // org.dromara.dynamictp.spring.DtpBaseBeanConfiguration.defaultEagerDtpExecutor
+    public static final String DEFAULT_DTP = "defaultEagerDtpExecutor";
+
+
     public DtpRegistry(DtpProperties dtpProperties) {
         DtpRegistry.dtpProperties = dtpProperties;
         EventBusManager.register(this);
+
+
     }
 
     /**
@@ -124,7 +133,7 @@ public class DtpRegistry {
      * @return the managed DtpExecutor instance
      */
     public static DtpExecutor getDtpExecutor(String name) {
-        val executorWrapper = getExecutorWrapper(name);
+        ExecutorWrapper executorWrapper = getExecutorWrapper(name);
         if (!executorWrapper.isDtpExecutor()) {
             log.error("The specified executor is not a DtpExecutor, name: {}", name);
             throw new DtpException("The specified executor is not a DtpExecutor, name: " + name);
@@ -139,10 +148,12 @@ public class DtpRegistry {
      * @return the managed executor instance
      */
     public static Executor getExecutor(String name) {
-        val executorWrapper = EXECUTOR_REGISTRY.get(name);
+        ExecutorWrapper executorWrapper = EXECUTOR_REGISTRY.get(name);
         if (Objects.isNull(executorWrapper)) {
             log.error("Cannot find a specified executor, name: {}", name);
-            throw new DtpException("Cannot find a specified executor, name: " + name);
+            //获取不到报错，并且返回个兜底线程池，防止业务出错
+            executorWrapper = EXECUTOR_REGISTRY.get(DEFAULT_DTP);
+            log.error("getDtpExecutor empty! return a default dtp, please check your config");
         }
         return executorWrapper.getExecutor();
     }
@@ -155,9 +166,13 @@ public class DtpRegistry {
      */
     public static ExecutorWrapper getExecutorWrapper(String name) {
         ExecutorWrapper executorWrapper = EXECUTOR_REGISTRY.get(name);
+
         if (Objects.isNull(executorWrapper)) {
             log.error("Cannot find a specified executorWrapper, name: {}", name);
-            throw new DtpException("Cannot find a specified executorWrapper, name: " + name);
+            //获取不到报错，并且返回个兜底线程池，防止业务出错
+            executorWrapper = EXECUTOR_REGISTRY.get(DEFAULT_DTP);
+            log.error("getDtpExecutor empty! return a default dtp, please check your config");
+
         }
         return executorWrapper;
     }
