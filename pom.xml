@@ -42,7 +42,6 @@
         <module>common</module>
         <module>starter</module>
         <module>logging</module>
-        <module>example</module>
         <module>extension</module>
         <module>jvmti</module>
         <module>test</module>

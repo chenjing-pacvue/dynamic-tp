@@ -52,10 +52,10 @@ public class DingNotifier extends AbstractHttpNotifier {
         return NotifyPlatformEnum.DING.name().toLowerCase();
     }
 
-    @Override
+
     protected String buildMsgBody(NotifyPlatform platform, String content) {
         MarkdownReq.Markdown markdown = new MarkdownReq.Markdown();
-        markdown.setTitle(DING_NOTICE_TITLE);
+        markdown.setTitle(DingNotifyConst.DING_NOTICE_TITLE);
         markdown.setText(content);
 
         MarkdownReq.At at = new MarkdownReq.At();
@@ -73,7 +73,6 @@ public class DingNotifier extends AbstractHttpNotifier {
         return JsonUtil.toJson(markdownReq);
     }
 
-    @Override
     protected String buildUrl(NotifyPlatform platform) {
         String webhook = Optional.ofNullable(platform.getWebhook()).orElse(DingNotifyConst.DING_WEBHOOK);
         return getTargetUrl(platform.getSecret(), platform.getUrlKey(), webhook);
@@ -98,16 +97,16 @@ public class DingNotifier extends AbstractHttpNotifier {
         }
 
         // 如果 accessToken 非空，且 URL 中未包含 access_token 参数，则添加
-        if (isNotBlank(accessToken) && !webhook.contains(ACCESS_TOKEN_PARAM + "=")) {
-            appendQueryParam(urlBuilder, ACCESS_TOKEN_PARAM, accessToken);
+        if (isNotBlank(accessToken) && !webhook.contains(DingNotifyConst.ACCESS_TOKEN_PARAM + "=")) {
+            appendQueryParam(urlBuilder, DingNotifyConst.ACCESS_TOKEN_PARAM, accessToken);
         }
 
         // 如果 secret 非空，计算时间戳和签名
         if (isNotBlank(secret)) {
             long timestamp = System.currentTimeMillis();
-            appendQueryParam(urlBuilder, TIMESTAMP_PARAM, String.valueOf(timestamp));
+            appendQueryParam(urlBuilder, DingNotifyConst.TIMESTAMP_PARAM, String.valueOf(timestamp));
             String sign = DingSignUtil.dingSign(secret, timestamp); // 自定义签名逻辑
-            appendQueryParam(urlBuilder, SIGN_PARAM, sign);
+            appendQueryParam(urlBuilder, DingNotifyConst.SIGN_PARAM, sign);
         }
 
         // 返回构建后的完整 URL
@@ -132,4 +131,5 @@ public class DingNotifier extends AbstractHttpNotifier {
             throw new RuntimeException("Error encoding query parameters", e);
         }
     }
+
 }
