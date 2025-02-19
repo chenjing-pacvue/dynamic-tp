@@ -19,6 +19,7 @@ package org.dromara.dynamictp.core.aware;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dromara.dynamictp.core.support.task.runnable.DtpRunnable;
+import org.dromara.dynamictp.core.support.task.runnable.NamedFuture;
 import org.dromara.dynamictp.core.support.task.runnable.NamedRunnable;
 import org.dromara.dynamictp.core.support.task.wrapper.TaskWrapper;
 
@@ -41,7 +42,15 @@ public interface TaskEnhanceAware extends DtpAware {
      */
     default Runnable getEnhancedTask(Runnable command, List<TaskWrapper> taskWrappers) {
         Runnable wrapRunnable = command;
-        String taskName = (wrapRunnable instanceof NamedRunnable) ? ((NamedRunnable) wrapRunnable).getName() : null;
+
+        String taskName = "";
+        if (wrapRunnable instanceof NamedRunnable) {
+            taskName = (wrapRunnable instanceof NamedRunnable) ? ((NamedRunnable) wrapRunnable).getName() : null;
+        }
+        if (wrapRunnable instanceof NamedFuture) {
+            taskName = (wrapRunnable instanceof NamedFuture) ? ((NamedFuture) wrapRunnable).getName() : null;
+        }
+
         if (CollectionUtils.isNotEmpty(taskWrappers)) {
             for (TaskWrapper t : taskWrappers) {
                 wrapRunnable = t.wrap(wrapRunnable);

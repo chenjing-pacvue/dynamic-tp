@@ -13,7 +13,7 @@
     <url>https://github.com/yanhom1314/dynamic-tp</url>
 
     <properties>
-        <revision>1.1.9.1</revision>
+        <revision>9.9.0-SNAPSHOT</revision>
 
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -29,7 +29,6 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
         <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
         <maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
@@ -124,13 +123,6 @@
         </license>
     </licenses>
 
-    <scm>
-        <url>https://github.com/yanhom1314/dynamic-tp/tree/master</url>
-        <connection>scm:git:git://github.com/yanhom1314/dynamic-tp.git</connection>
-        <developerConnection>scm:git:ssh://github.com:yanhom1314/dynamic-tp.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-
     <developers>
         <developer>
             <id>yanhom</id>
@@ -140,20 +132,29 @@
         </developer>
     </developers>
 
-    <issueManagement>
-        <system>Github Issue</system>
-        <url>https://github.com/yanhom1314/dynamic-tp/issues</url>
-    </issueManagement>
-
+    <scm>
+        <connection>scm:git:https://github.com/chenjing-pacvue/dynamic-tp.git</connection>
+        <developerConnection>scm:git:https://github.com/chenjing-pacvue/dynamic-tp.git
+        </developerConnection>
+        <url>https://github.com/chenjing-pacvue/dynamic-tp.git</url>
+        <tag>HEAD</tag>
+    </scm>
+    <!-- 定义发布到的Maven私服 -->
     <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>releases</id>
+            <name>Nexus release</name>
+            <url>
+                https://nexus.pacvue.com/repository/maven-releases/
+            </url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Nexus snapshot</name>
+            <url>
+                https://nexus.pacvue.com/repository/maven-snapshots/
+            </url>
+        </snapshotRepository>
     </distributionManagement>
 
     <build>
@@ -230,35 +231,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Implementation-Title>${project.artifactId}</Implementation-Title>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                            <Built-By>yanhom</Built-By>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
 
-            <!-- Gpg Signature -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
