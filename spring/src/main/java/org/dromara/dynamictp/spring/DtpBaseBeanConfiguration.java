@@ -81,19 +81,4 @@ public class DtpBaseBeanConfiguration {
         return new DtpApplicationListener();
     }
 
-
-    @Order(10)
-    @DynamicTp(DEFAULT_DTP)
-    @Bean
-    public DtpExecutor defaultEagerDtpExecutor() {
-        return ThreadPoolBuilder.newBuilder()
-            .threadPoolName(DEFAULT_DTP)
-            .threadFactory("test-eager")
-            .corePoolSize(1)
-            .maximumPoolSize(1)
-            .queueCapacity(0)
-            .rejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy())
-            .eager(true)
-            .buildDynamic();
-    }
 }
