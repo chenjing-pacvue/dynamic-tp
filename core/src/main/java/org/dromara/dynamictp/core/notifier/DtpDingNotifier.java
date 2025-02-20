@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import lombok.val;
-import org.dromara.dynamictp.common.constant.DingNotifyConst;
 import org.dromara.dynamictp.common.em.NotifyPlatformEnum;
 import org.dromara.dynamictp.common.notifier.Notifier;
 import lombok.extern.slf4j.Slf4j;
