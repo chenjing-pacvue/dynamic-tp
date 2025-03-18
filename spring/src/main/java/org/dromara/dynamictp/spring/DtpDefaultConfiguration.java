@@ -12,17 +12,4 @@ import org.springframework.core.annotation.Order;
 
 @Configuration
 public class DtpDefaultConfiguration {
-
-    @Bean
-    public DtpExecutor defaultEagerDtpExecutor() {
-        return ThreadPoolBuilder.newBuilder()
-            .threadPoolName(DEFAULT_DTP)
-            .threadFactory("test-eager")
-            .corePoolSize(1)
-            .maximumPoolSize(1)
-            .queueCapacity(0)
-            .rejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy())
-            .eager(true)
-            .buildDynamic();
-    }
 }

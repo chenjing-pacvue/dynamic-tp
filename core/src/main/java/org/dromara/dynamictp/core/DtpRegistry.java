@@ -94,11 +94,25 @@ public class DtpRegistry {
     public static final String DEFAULT_DTP = "defaultEagerDtpExecutor";
 
 
+
     public DtpRegistry(DtpProperties dtpProperties) {
         DtpRegistry.dtpProperties = dtpProperties;
         EventBusManager.register(this);
+        DtpExecutor defaultEagerDtpExecutor = defaultEagerDtpExecutor();
+        EXECUTOR_REGISTRY.putIfAbsent(DEFAULT_DTP, new ExecutorWrapper(defaultEagerDtpExecutor));
 
+    }
 
+    public DtpExecutor defaultEagerDtpExecutor() {
+        return ThreadPoolBuilder.newBuilder()
+            .threadPoolName(DEFAULT_DTP)
+            .threadFactory("test-eager")
+            .corePoolSize(1)
+            .maximumPoolSize(1)
+            .queueCapacity(0)
+            .rejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy())
+            .eager(true)
+            .buildDynamic();
     }
 
     /**
