@@ -186,6 +186,7 @@ public class DtpExecutor extends ThreadPoolExecutor implements TaskEnhanceAware,
     @Override
     protected void beforeExecute(Thread t, Runnable r) {
         AwareManager.beforeExecute(this, t, r);
+        //todo 将当前要执行的任务维护到自身记录下来
         super.beforeExecute(t, r);
     }
 
@@ -193,6 +194,7 @@ public class DtpExecutor extends ThreadPoolExecutor implements TaskEnhanceAware,
     protected void afterExecute(Runnable r, Throwable t) {
         super.afterExecute(r, t);
         AwareManager.afterExecute(this, r, t);
+        //todo 将当前要执行的任务维护到自身记录下来
         ExecutorUtil.tryExecAfterExecute(r, t);
     }
 

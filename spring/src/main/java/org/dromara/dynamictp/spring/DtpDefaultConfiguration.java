@@ -13,8 +13,6 @@ import org.springframework.core.annotation.Order;
 @Configuration
 public class DtpDefaultConfiguration {
 
-    @Order(10)
-    @DynamicTp(DEFAULT_DTP)
     @Bean
     public DtpExecutor defaultEagerDtpExecutor() {
         return ThreadPoolBuilder.newBuilder()

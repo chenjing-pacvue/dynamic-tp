@@ -23,7 +23,9 @@ import org.dromara.dynamictp.core.support.task.runnable.NamedFuture;
 import org.dromara.dynamictp.core.support.task.runnable.NamedRunnable;
 import org.dromara.dynamictp.core.support.task.wrapper.TaskWrapper;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 
 /**
  * TaskEnhanceAware related
@@ -32,6 +34,43 @@ import java.util.List;
  * @since 1.1.4
  **/
 public interface TaskEnhanceAware extends DtpAware {
+
+    /**
+     * 获取线程池里面实际正在执行的task，可能被封装了N层
+     * @param futureTask
+     * @return
+     */
+    static Object extractTaskFromFutureTask(FutureTask<?> futureTask) {
+        try {
+            // 1. 获取 FutureTask 内部的 "callable" 字段（该字段为 private final Callable<V> callable;）
+            Field callableField = FutureTask.class.getDeclaredField("callable");
+            callableField.setAccessible(true);
+            Object callableObj = callableField.get(futureTask);
+
+            // 2. 如果 callableObj 是由 RunnableAdapter 包装的，则其内部通常有一个 "task" 字段
+            if (callableObj != null && callableObj.getClass().getName().contains("RunnableAdapter")) {
+                Field taskField = callableObj.getClass().getDeclaredField("task");
+                taskField.setAccessible(true);
+                Object originalTask = taskField.get(callableObj);
+                return originalTask;
+            }
+            // 如果不是 RunnableAdapter，则直接返回 callableObj
+            return callableObj;
+        } catch (Exception e) {
+            throw new RuntimeException("无法提取内部 task", e);
+        }
+    }
+
+    static String getRunnableName(Runnable wrapRunnable) {
+        String taskName = "";
+        if (wrapRunnable instanceof NamedRunnable) {
+            taskName = (wrapRunnable instanceof NamedRunnable) ? ((NamedRunnable) wrapRunnable).getName() : null;
+        }
+        if (wrapRunnable instanceof NamedFuture) {
+            taskName = (wrapRunnable instanceof NamedFuture) ? ((NamedFuture) wrapRunnable).getName() : null;
+        }
+        return taskName;
+    }
 
     /**
      * Enhance task
@@ -44,12 +83,18 @@ public interface TaskEnhanceAware extends DtpAware {
         Runnable wrapRunnable = command;
 
         String taskName = "";
-        if (wrapRunnable instanceof NamedRunnable) {
-            taskName = (wrapRunnable instanceof NamedRunnable) ? ((NamedRunnable) wrapRunnable).getName() : null;
+        try {
+            if (wrapRunnable instanceof FutureTask) {
+                //反射拿到里面的原runnable
+                Runnable o = (Runnable) extractTaskFromFutureTask((FutureTask) command);
+                taskName = getRunnableName(o);
+            } else {
+                taskName = getRunnableName(wrapRunnable);
+            }
+        } catch (Exception ex) {
+
         }
-        if (wrapRunnable instanceof NamedFuture) {
-            taskName = (wrapRunnable instanceof NamedFuture) ? ((NamedFuture) wrapRunnable).getName() : null;
-        }
+
 
         if (CollectionUtils.isNotEmpty(taskWrappers)) {
             for (TaskWrapper t : taskWrappers) {

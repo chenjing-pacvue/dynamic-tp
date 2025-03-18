@@ -17,7 +17,11 @@
 
 package org.dromara.dynamictp.test.core;
 
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import org.dromara.dynamictp.core.DtpRegistry;
+import org.dromara.dynamictp.core.executor.eager.EagerDtpExecutor;
 import org.dromara.dynamictp.core.support.ExecutorWrapper;
 import org.dromara.dynamictp.core.support.ThreadPoolBuilder;
 import org.dromara.dynamictp.core.executor.DtpExecutor;
@@ -41,4 +45,23 @@ class DtpRegistryTest {
         Assertions.assertEquals("test_dtp", ((DtpExecutor)DtpRegistry.getExecutor("test_dtp")).getThreadPoolName());
     }
 
+    @Test
+    public void testEagerDtpExecutor() {
+        ThreadPoolExecutor businessTP = getBusinessTP();
+        Future task1 = businessTP.submit(() -> System.out.println("task1"));
+    }
+
+
+    public ThreadPoolExecutor getBusinessTP() {
+
+        ThreadPoolExecutor eagerDtpExecutor = null;
+        try {
+            eagerDtpExecutor = (EagerDtpExecutor) DtpRegistry.getExecutorWrapper("common_bus_dtp").getExecutor().getOriginal();
+        } catch (Exception ex) {
+            System.out.println("DtpRegistry.getExecutorWrapper error no DtpRegistry");
+        }
+
+
+        return eagerDtpExecutor;
+    }
 }

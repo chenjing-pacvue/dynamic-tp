@@ -19,7 +19,6 @@ package org.dromara.dynamictp.core.notifier.alarm;
 
 import cn.hutool.core.util.NumberUtil;
 import lombok.val;
-import lombok.var;
 import org.dromara.dynamictp.common.em.NotifyItemEnum;
 import org.dromara.dynamictp.common.entity.AlarmInfo;
 import org.dromara.dynamictp.core.support.ExecutorWrapper;
